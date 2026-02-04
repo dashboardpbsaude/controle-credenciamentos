@@ -1,0 +1,233 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+<meta charset="UTF-8">
+<title>Painel de Credenciamentos</title>
+
+<!-- Bootstrap / Select2 -->
+<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+<link href="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css" rel="stylesheet">
+
+<!-- JS libs -->
+<script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
+
+<style>
+html, body{ overflow-x:hidden; }
+
+/* ================= FILTROS ================= */
+.filtros-linha{
+    display:grid;
+    grid-template-columns: 2fr 5fr 2fr auto;
+    gap:12px;
+    align-items:end;
+}
+
+.filtro-item label{
+    font-size:.8rem;
+    font-weight:600;
+}
+
+.select2-container{ width:100%!important; }
+
+/* ================= TABELA ================= */
+.table-clean{
+    table-layout:fixed;
+    width:100%;
+}
+
+.table-clean td, .table-clean th{
+    border:none;
+    padding:8px 6px;
+    vertical-align:middle;
+}
+
+.table-clean tr{
+    border-bottom:1px solid #cfcfcf;
+}
+
+.linha-continuacao td{
+    padding-top:2px;
+}
+
+/* larguras */
+.table-clean th:nth-child(1),
+.table-clean td:nth-child(1){ width:26%; }
+
+.table-clean th:nth-child(2),
+.table-clean td:nth-child(2){ width:26%; }
+
+.table-clean th:nth-child(3),
+.table-clean td:nth-child(3){ width:12%; }
+
+.table-clean th:nth-child(4),
+.table-clean td:nth-child(4){ width:14%; }
+
+.table-clean th:nth-child(5),
+.table-clean td:nth-child(5){ width:10%; }
+
+.table-clean th:nth-child(6),
+.table-clean td:nth-child(6){
+    width:7%;
+    text-align:center;
+}
+
+.table-clean th:nth-child(7),
+.table-clean td:nth-child(7){
+    width:5%;
+    text-align:center;
+}
+
+/* botões */
+.btn-obs,
+.btn-medicos{
+    padding:2px 6px;
+    line-height:1;
+}
+
+/* ================= HEADER / FOOTER ================= */
+.header{
+    padding:10px 0 2px;
+    text-align:center;
+}
+
+.header img{ height:120px; }
+
+.footer{
+    margin-top:40px;
+    padding-top:12px;
+    border-top:1px solid #ddd;
+    font-size:.8rem;
+    color:#555;
+    text-align:center;
+}
+
+/* MODAL MÉDICOS */
+
+#modalMedicos th:nth-child(2),
+#modalMedicos th:nth-child(3),
+#modalMedicos td:nth-child(2),
+#modalMedicos td:nth-child(3){
+    text-align: right;
+}
+
+</style>
+</head>
+
+<body class="p-4">
+
+<!-- HEADER -->
+<div class="header">
+    <img src="/static/img/Logo PBSAÚDE.png" alt="PB Saúde">
+</div>
+
+<h4 class="mb-1 text-center">Controle de Credenciamentos</h4>
+
+<!-- FILTROS -->
+<div class="mt-4 mb-2">
+    <h6 class="fw-semibold mb-1" style="color:#0000FF;">Filtros:</h6>
+    <hr class="mt-0">
+</div>
+
+<div class="card mb-3">
+    <div class="card-body">
+        <div class="filtros-linha">
+
+            <div class="filtro-item">
+                <label>Unidade</label>
+                <select id="filtroUnid" class="form-select">
+                    <option></option>
+                </select>
+            </div>
+
+            <div class="filtro-item">
+                <label>Especialidade</label>
+                <select id="filtroEspecialidade" class="form-select">
+                    <option></option>
+                </select>
+            </div>
+
+            <div class="filtro-item">
+                <label>Status</label>
+                <select id="filtroStatus" class="form-select">
+                    <option></option>
+                </select>
+            </div>
+
+            <div class="filtro-item">
+                <button id="btnLimpar" class="btn btn-outline-secondary btn-sm">
+                    Limpar
+                </button>
+            </div>
+
+        </div>
+    </div>
+</div>
+
+<!-- ACCORDION -->
+<div class="accordion" id="accordionCred"></div>
+
+<!-- MODAL MÉDICOS -->
+<div class="modal fade" id="modalMedicos" tabindex="-1">
+    <div class="modal-dialog modal-lg modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Médicos vinculados</h5>
+                <button class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body">
+                <table class="table table-clean">
+                    <thead>
+                        <tr>
+                            <th>PROFISSIONAL</th>
+                            <th>CRM</th>
+                            <th>RQE</th>
+                        </tr>
+                    </thead>
+                    <tbody id="tbodyMedicos"></tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- MODAL OBS -->
+<div class="modal fade" id="modalObservacoes" tabindex="-1">
+    <div class="modal-dialog modal-lg modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Observações</h5>
+                <button class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body">
+                <div id="conteudoObservacoes" style="white-space:pre-wrap;"></div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- FOOTER -->
+<div class="footer">
+    © 2026 Fundação Paraibana de Gestão em Saúde - PB Saúde<br>
+    Comissão de Credenciamento<br>
+    <span style="font-size:.85em;">
+        Desenvolvimento: Gerência Executiva de Ciência, Inovação e Incorporação Tecnológica em Saúde
+    </span>
+</div>
+
+<!-- APP -->
+<script src="/static/js/app.js"></script>
+
+<script>
+$(function(){
+    $("select").select2({
+        placeholder:"Selecione",
+        allowClear:true,
+        width:"resolve"
+    });
+});
+</script>
+
+</body>
+</html>

@@ -1,0 +1,14 @@
+# Configurações de ambiente (Obrigatório!)
+.env
+.flaskenv
+
+# Credenciais e chaves (Para garantir)
+credentials.json
+*.pem
+*.key
+
+# Pastas do Python e VS Code
+__pycache__/
+venv/
+.vscode/
+.env/
