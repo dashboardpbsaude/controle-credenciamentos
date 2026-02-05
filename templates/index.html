@@ -4,11 +4,9 @@
 <meta charset="UTF-8">
 <title>Painel de Credenciamentos</title>
 
-<!-- Bootstrap / Select2 -->
 <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
 <link href="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css" rel="stylesheet">
 
-<!-- JS libs -->
 <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
@@ -16,12 +14,59 @@
 <style>
 html, body{ overflow-x:hidden; }
 
-/* ================= FILTROS ================= */
-.filtros-linha{
+/* HEADER */
+.header{
+    padding:10px 0 2px;
+    text-align:center;
+}
+.header img{ height:120px; }
+
+/* TÍTULOS DOS FILTROS */
+.filtros-titulo-linha{
     display:grid;
-    grid-template-columns: 2fr 5fr 2fr auto;
-    gap:12px;
+    grid-template-columns: 70% 30%;
     align-items:end;
+    font-size:.85rem;
+    font-weight:600;
+    color:#0000FF;
+    margin-top:1rem;
+}
+
+.filtros-titulo-esq{
+    text-align:left;
+}
+
+.filtros-titulo-dir{
+    text-align:left;
+    padding-left:18px; /* recuo maior */
+}
+
+/* FILTROS */
+.filtros-container{
+    display:grid;
+    grid-template-columns: 70% 30%;
+    gap:16px;
+    margin-bottom:1rem;
+}
+
+.filtros-box{
+    border:1px solid #ddd;
+    border-radius:6px;
+    padding:12px;
+}
+
+.filtros-box.status{
+    max-width:510px; /* retângulo maior */
+}
+
+.filtros-box-linha{
+    display:flex;
+    gap:16px;
+    align-items:end;
+}
+
+.filtro-item{
+    flex:1;
 }
 
 .filtro-item label{
@@ -31,13 +76,14 @@ html, body{ overflow-x:hidden; }
 
 .select2-container{ width:100%!important; }
 
-/* ================= TABELA ================= */
+/* TABELA */
 .table-clean{
     table-layout:fixed;
     width:100%;
 }
 
-.table-clean td, .table-clean th{
+.table-clean th,
+.table-clean td{
     border:none;
     padding:8px 6px;
     vertical-align:middle;
@@ -51,49 +97,43 @@ html, body{ overflow-x:hidden; }
     padding-top:2px;
 }
 
-/* larguras */
 .table-clean th:nth-child(1),
-.table-clean td:nth-child(1){ width:26%; }
+.table-clean td:nth-child(1){ width:26%; text-align:left; }
 
 .table-clean th:nth-child(2),
-.table-clean td:nth-child(2){ width:26%; }
+.table-clean td:nth-child(2){ width:26%; text-align:left; }
 
 .table-clean th:nth-child(3),
-.table-clean td:nth-child(3){ width:12%; }
+.table-clean td:nth-child(3){ width:12%; text-align:left; }
 
 .table-clean th:nth-child(4),
-.table-clean td:nth-child(4){ width:14%; }
+.table-clean td:nth-child(4){ width:14%; text-align:center; }
 
 .table-clean th:nth-child(5),
-.table-clean td:nth-child(5){ width:10%; }
+.table-clean td:nth-child(5){ width:10%; text-align:center; }
 
 .table-clean th:nth-child(6),
-.table-clean td:nth-child(6){
-    width:7%;
-    text-align:center;
-}
+.table-clean td:nth-child(6){ width:7%; text-align:center; }
 
 .table-clean th:nth-child(7),
-.table-clean td:nth-child(7){
-    width:5%;
-    text-align:center;
-}
+.table-clean td:nth-child(7){ width:5%; text-align:center; }
 
-/* botões */
 .btn-obs,
 .btn-medicos{
     padding:2px 6px;
     line-height:1;
 }
 
-/* ================= HEADER / FOOTER ================= */
-.header{
-    padding:10px 0 2px;
-    text-align:center;
+/* MODAL MÉDICOS */
+#modalMedicos th:nth-child(2),
+#modalMedicos th:nth-child(3),
+#modalMedicos td:nth-child(2),
+#modalMedicos td:nth-child(3){
+    text-align:right;
+    font-family:monospace;
 }
 
-.header img{ height:120px; }
-
+/* FOOTER */
 .footer{
     margin-top:40px;
     padding-top:12px;
@@ -102,73 +142,58 @@ html, body{ overflow-x:hidden; }
     color:#555;
     text-align:center;
 }
-
-/* MODAL MÉDICOS */
-
-#modalMedicos th:nth-child(2),
-#modalMedicos th:nth-child(3),
-#modalMedicos td:nth-child(2),
-#modalMedicos td:nth-child(3){
-    text-align: right;
-}
-
 </style>
 </head>
 
 <body class="p-4">
 
-<!-- HEADER -->
 <div class="header">
     <img src="/static/img/Logo PBSAÚDE.png" alt="PB Saúde">
 </div>
 
-<h4 class="mb-1 text-center">Controle de Credenciamentos</h4>
+<h4 class="mb-3 text-center">Controle de Credenciamentos</h4>
 
-<!-- FILTROS -->
-<div class="mt-4 mb-2">
-    <h6 class="fw-semibold mb-1" style="color:#0000FF;">Filtros:</h6>
-    <hr class="mt-0">
+<div class="filtros-titulo-linha">
+    <div class="filtros-titulo-esq">Editais por:</div>
+    <div class="filtros-titulo-dir">Status do Contrato:</div>
 </div>
 
-<div class="card mb-3">
-    <div class="card-body">
-        <div class="filtros-linha">
+<div class="filtros-container">
 
+    <div class="filtros-box">
+        <div class="filtros-box-linha">
             <div class="filtro-item">
                 <label>Unidade</label>
-                <select id="filtroUnid" class="form-select">
-                    <option></option>
-                </select>
+                <select id="filtroUnid" class="form-select"></select>
             </div>
 
             <div class="filtro-item">
                 <label>Especialidade</label>
-                <select id="filtroEspecialidade" class="form-select">
-                    <option></option>
-                </select>
+                <select id="filtroEspecialidade" class="form-select"></select>
             </div>
+        </div>
+    </div>
 
+    <div class="filtros-box status">
+        <div class="filtros-box-linha">
             <div class="filtro-item">
                 <label>Status</label>
-                <select id="filtroStatus" class="form-select">
-                    <option></option>
-                </select>
+                <select id="filtroStatus" class="form-select"></select>
             </div>
 
-            <div class="filtro-item">
+            <div class="filtro-item" style="flex:0;">
+                <label>&nbsp;</label>
                 <button id="btnLimpar" class="btn btn-outline-secondary btn-sm">
                     Limpar
                 </button>
             </div>
-
         </div>
     </div>
+
 </div>
 
-<!-- ACCORDION -->
 <div class="accordion" id="accordionCred"></div>
 
-<!-- MODAL MÉDICOS -->
 <div class="modal fade" id="modalMedicos" tabindex="-1">
     <div class="modal-dialog modal-lg modal-dialog-centered">
         <div class="modal-content">
@@ -192,7 +217,6 @@ html, body{ overflow-x:hidden; }
     </div>
 </div>
 
-<!-- MODAL OBS -->
 <div class="modal fade" id="modalObservacoes" tabindex="-1">
     <div class="modal-dialog modal-lg modal-dialog-centered">
         <div class="modal-content">
@@ -207,7 +231,6 @@ html, body{ overflow-x:hidden; }
     </div>
 </div>
 
-<!-- FOOTER -->
 <div class="footer">
     © 2026 Fundação Paraibana de Gestão em Saúde - PB Saúde<br>
     Comissão de Credenciamento<br>
@@ -216,9 +239,7 @@ html, body{ overflow-x:hidden; }
     </span>
 </div>
 
-<!-- APP -->
 <script src="/static/js/app.js"></script>
-
 <script>
 $(function(){
     $("select").select2({
