@@ -1,3 +1,4 @@
+// ======================= static/js/app.js =======================
 let dados = [];
 
 $(document).ready(function () {
@@ -53,7 +54,7 @@ function aplicarFiltros(){
     renderizar(filtrado);
 }
 
-// ======================= RENDER =======================
+// ======================= RENDERIZAÇÃO =======================
 function formatarServico(txt){
     if(!txt) return "";
     return txt.replace(/\n/g,"<br>");
@@ -104,8 +105,14 @@ function renderizar(lista){
         for(const k in grupos){
             const g=grupos[k];
 
+            g.linhas.sort((a,b)=>
+                (a["EMPRESA CREDENCIADA"]||"")
+                    .localeCompare(b["EMPRESA CREDENCIADA"]||"","pt-BR")
+            );
+
             let linhasHTML="";
             let ultimaEmpresa=null;
+            let ultimoStatus="";
 
             g.linhas.forEach(l=>{
                 const mesmaEmpresa = l["EMPRESA CREDENCIADA"] === ultimaEmpresa;
@@ -115,11 +122,22 @@ function renderizar(lista){
                     vig=`${l["VIGÊNCIA INICIAL"]||""} a ${l["VIGÊNCIA FINAL"]||""}`;
                 }
 
-                let st=l.STATUS||"";
-                if(l.STATUS==="VIGENTE"){
+                const temVigencia = (l["VIGÊNCIA INICIAL"] || l["VIGÊNCIA FINAL"]);
+
+                let st = "";
+
+                if (l.STATUS) {
+                    st = l.STATUS;
+                    ultimoStatus = l.STATUS;
+                } else if (mesmaEmpresa && temVigencia) {
+    st = ultimoStatus;
+                }
+
+
+                if(st==="VIGENTE"){
                     st=`<span style="color:green;font-weight:600">VIGENTE</span>`;
-                }else if(l.STATUS==="VENCIDO"){
-                    st=`<span style="color:red">VENCIDO</span>`;
+                }else if(st==="VENCIDO"){
+                    st=`<span style="color:red;font-weight:600">VENCIDO</span>`;
                 }
 
                 const obsTexto = getObservacao(l) || "Nenhuma observação.";
@@ -178,8 +196,6 @@ function renderizar(lista){
                                 ${linhasHTML}
                             </tbody>
                         </table>
-
-                        </table>
                     </div>
                 </div>
             </div>`;
@@ -222,7 +238,7 @@ $(document).on("click", ".btn-obs", function(){
     ).show();
 });
 
-// ======================= MODAL MÉDICOS (SEMPRE ABRE) =======================
+// ======================= MODAL MÉDICOS =======================
 $(document).on("click", ".btn-medicos", function(){
     const empresa = $(this).data("empresa");
     const tbody = $("#tbodyMedicos");
