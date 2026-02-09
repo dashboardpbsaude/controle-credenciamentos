@@ -26,9 +26,15 @@ function carregarFiltros(dados){
 }
 
 function preencher(id, valores){
-    const sel=$(id);
-    sel.empty().append(`<option></option>`);
-    valores.filter(Boolean).sort().forEach(v=>{
+    const sel = $(id);
+    sel.empty();
+
+    // opção vazia só para selects que NÃO são múltiplos
+    if(!sel.prop("multiple")){
+        sel.append(`<option></option>`);
+    }
+
+    valores.sort().forEach(v=>{
         sel.append(`<option value="${v}">${v}</option>`);
     });
 }
@@ -37,22 +43,52 @@ function aplicarFiltros(){
     let f={
         unid:$("#filtroUnid").val(),
         esp:$("#filtroEspecialidade").val(),
-        status:$("#filtroStatus").val()
+        status:$("#filtroStatus").val() || []
     };
 
-    const filtrado=dados.filter(d=>{
+    // 1) filtro básico
+    let filtrado = dados.filter(d=>{
         const unidReg=(d.UNID||"").toUpperCase();
         const unidFil=(f.unid||"").toUpperCase();
 
         return (
             (!f.esp || d.ESPECIALIDADE===f.esp) &&
-            (!f.status || d.STATUS===f.status) &&
             (!f.unid || unidReg.includes(unidFil))
         );
     });
 
+    // 2) filtro por STATUS (por grupo)
+    if(f.status.length > 0){
+        const grupos = {};
+
+        filtrado.forEach(d=>{
+            const k=`${d.EDITAL}|${d.ESPECIALIDADE}|${d.UNID}`;
+            if(!grupos[k]) grupos[k]=[];
+            grupos[k].push(d);
+        });
+
+        filtrado = [];
+
+        for(const k in grupos){
+            const linhas = grupos[k];
+
+            // verifica se o grupo tem status válido selecionado
+            const temStatusSelecionado = linhas.some(l =>
+                l.STATUS && f.status.includes(l.STATUS)
+            );
+
+            if(temStatusSelecionado){
+                // 👉 quando filtra por status, só traz linhas COM STATUS
+                filtrado.push(
+                    ...linhas.filter(l => l.STATUS && f.status.includes(l.STATUS))
+                );
+            }
+        }
+    }
+
     renderizar(filtrado);
 }
+
 
 // ======================= RENDERIZAÇÃO =======================
 function formatarServico(txt){
